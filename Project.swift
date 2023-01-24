@@ -57,6 +57,7 @@ let project = Project(
         .external(name: "AppDevUtils"),
         .external(name: "Inject"),
         .target(name: "SmartKeyKeyboard"),
+        .external(name: "KeyboardKit"),
       ]
     ),
     Target(
@@ -83,6 +84,7 @@ let project = Project(
       ],
       dependencies: [
         .external(name: "KeyboardKit"),
+        .external(name: "OpenAI"),
       ]
     ),
   ]

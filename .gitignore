@@ -121,3 +121,4 @@ Private/
 *.xcworkspace
 *.xcodeproj
 .prompt
+Keyboard/Sources/Secrets.swift
