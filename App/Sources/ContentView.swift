@@ -5,7 +5,7 @@ import KeyboardKit
 
 struct ContentView: View {
   @StateObject private var keyboardState = KeyboardEnabledState(bundleId: "me.igortarasenko.SmartKey.Keyboard")
-  @State private var text: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  @State private var text: String = "Write something and send it to AI"
 
   var body: some View {
     NavigationView {

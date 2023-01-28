@@ -21,6 +21,7 @@ public enum APIService {
 
   private static let openAI = OpenAI(apiToken: Secrets.openAIKey)
   public static func getCompletion(for text: String, temperature: Double, maxTokens: Int) async throws -> String {
+    print("Getting completion for: \(text)")
     let response = try await openAI.completions(query: OpenAI.CompletionsQuery(
       model: .textDavinci_003,
       prompt: text,
@@ -30,7 +31,7 @@ public enum APIService {
       frequency_penalty: 0,
       presence_penalty: 0
     ))
-    return response.choices.first?.text ?? ""
+    return response.choices.first?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
   }
 }
 

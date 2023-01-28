@@ -1,5 +1,5 @@
-import SwiftUI
 import KeyboardKit
+import SwiftUI
 
 // MARK: - CardsPagerView
 
@@ -8,6 +8,10 @@ struct CardsPagerView: View {
   @EnvironmentObject private var keyboardContext: KeyboardContext
 
   @EnvironmentObject private var keyboardTextContext: KeyboardTextContext
+
+  var hasSelectedText: Bool {
+    keyboardContext.textDocumentProxy.selectedText?.count ?? 0 > 0
+  }
 
   init(viewModel: KeyboardViewModel) {
     self.viewModel = viewModel
@@ -18,83 +22,113 @@ struct CardsPagerView: View {
       Color(.systemGray4)
 
       VStack(spacing: 4) {
-        if !viewModel.error.isEmpty {
-          Text("Error: \(viewModel.error)").font(.caption)
-            .lineLimit(3)
-            .foregroundColor(.red)
-        }
-
-        TabView {
+        TabView(selection: $viewModel.selectedIndex) {
           CardView {
+            if !viewModel.error.isEmpty {
+              Text("Error: \(viewModel.error)").font(.caption)
+                .lineLimit(3)
+                .foregroundColor(.red)
+            }
+
+            Button { viewModel.execute() } label: {
+              Text("Send to AI")
+                .font(.headline)
+                .padding()
+                .blueButtonStyle()
+            }
+            .padding(12)
+
             HStack(spacing: 8) {
-              Button { viewModel.rewriteSelected() } label: {
-                Text("Rewrite selected (\(keyboardContext.textDocumentProxy.selectedText?.count ?? 0)c)")
+              Button { viewModel.execute { "Improve: \($0)" } } label: {
+                Text("Improve")
                   .blueButtonStyle()
               }
-              // Button { viewModel.rewriteClipboard() } label: {
-              //   Text("Rewrite from clipboard")
-              //     .blueButtonStyle()
-              // }
-              Button { viewModel.rewriteDocument() } label: {
-                Text("Rewrite document")
+              Button { viewModel.execute { "Simplify: \($0)" } } label: {
+                Text("Simplify")
+                  .blueButtonStyle()
+              }
+              Button { viewModel.execute { "Fix typos and grammar errors: \($0)" } } label: {
+                Text("Fix")
                   .blueButtonStyle()
               }
             }
             HStack(spacing: 8) {
-              Button { viewModel.executeSelected() } label: {
-                Text("Execute selected (\(keyboardContext.textDocumentProxy.selectedText?.count ?? 0)c)")
+              Button { viewModel.execute { "Rewrite in casual style: \($0)" } } label: {
+                Text("Casual Rewrite")
                   .blueButtonStyle()
               }
-              // Button { viewModel.executeClipboard() } label: {
-              //   Text("Execute from clipboard")
-              //     .blueButtonStyle()
-              // }
-              Button { viewModel.executeDocument() } label: {
-                Text("Continue document")
+              Button { viewModel.execute { "Rewrite in professional style: \($0)" } } label: {
+                Text("Professional Rewrite")
                   .blueButtonStyle()
               }
             }
           }
-            .padding(.bottom, KeyboardLayoutConfiguration.standard(for: keyboardContext).rowHeight)
+          .overlay {
+            if viewModel.isLoading {
+              Color.black.opacity(0.7)
+                .overlay {
+                  VStack(spacing: 4) {
+                    ProgressView()
+                    Text("Generating...")
+                      .padding(.bottom, 4)
+                    Text("It may take up to 10 seconds\ndepending on the length of the text.")
+                      .font(.footnote)
+                  }
+                    .multilineTextAlignment(.center)
+                }
+                .padding(8)
+            }
+          }
+          .padding(.bottom, KeyboardLayoutConfiguration.standard(for: keyboardContext).rowHeight)
+          .tag(0)
 
           CardView {
             Text("Result: ").font(.headline)
             ScrollView {
               Text(viewModel.lastResult)
-                .lineLimit(5)
+                .lineLimit(nil)
                 .font(.body)
-                .padding(2)
+                .fixedSize(horizontal: false, vertical: true)
             }
             .textSelection(.enabled)
 
             if !viewModel.lastResult.isEmpty {
               HStack(spacing: 4) {
-                Button { viewModel.reset() } label: {
-                  Text("Reset")
-                    .blueButtonStyle()
-                }
-                Button { viewModel.replaceSelectionWithResult() } label: {
-                  Text("Replace selection")
-                    .blueButtonStyle()
+                if hasSelectedText {
+                  Button { viewModel.replaceSelectionWithResult() } label: {
+                    Text("Replace selection")
+                      .blueButtonStyle()
+                  }
                 }
                 Button { viewModel.insertAfter() } label: {
                   Text("Insert after")
                     .blueButtonStyle()
                 }
+                Button { viewModel.replaceDocumentWithResult() } label: {
+                  Text("Replace document")
+                    .blueButtonStyle()
+                }
               }
             }
           }
-            .padding(.bottom, KeyboardLayoutConfiguration.standard(for: keyboardContext).rowHeight)
+          .padding(.bottom, KeyboardLayoutConfiguration.standard(for: keyboardContext).rowHeight)
+          .tag(1)
 
           CardView {
             SystemKeyboard()
               .clipped()
           }
-            .padding(.bottom, KeyboardLayoutConfiguration.standard(for: keyboardContext).rowHeight)
-
+          .padding(.bottom, KeyboardLayoutConfiguration.standard(for: keyboardContext).rowHeight)
+          .tag(2)
         }
         .tabViewStyle(.page)
         .indexViewStyle(.page(backgroundDisplayMode: .always))
+        .overlay(alignment: .bottomLeading) {
+          if viewModel.isLoading {
+            ProgressView()
+              .padding(4)
+          }
+        }
       }
     }
   }
@@ -129,8 +163,8 @@ struct CardView<Content: View>: View {
       VStack(spacing: 4) {
         content
       }
-        .frame(maxHeight: .infinity)
-        .padding(16)
+      .frame(maxHeight: .infinity)
+      .padding(16)
     }
   }
 }
