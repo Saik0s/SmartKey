@@ -39,15 +39,19 @@ struct CardsPagerView: View {
             .padding(12)
 
             HStack(spacing: 8) {
+              Button { viewModel.execute(chat, asChat: true) } label: {
+                Text("Chat")
+                  .blueButtonStyle()
+              }
               Button { viewModel.execute { "Improve: \($0)" } } label: {
                 Text("Improve")
                   .blueButtonStyle()
               }
-              Button { viewModel.execute { "Simplify: \($0)" } } label: {
+              Button { viewModel.execute(explain) } label: {
                 Text("Simplify")
                   .blueButtonStyle()
               }
-              Button { viewModel.execute { "Fix typos and grammar errors: \($0)" } } label: {
+              Button { viewModel.execute(fixErrors) } label: {
                 Text("Fix")
                   .blueButtonStyle()
               }
@@ -74,7 +78,7 @@ struct CardsPagerView: View {
                     Text("It may take up to 10 seconds\ndepending on the length of the text.")
                       .font(.footnote)
                   }
-                    .multilineTextAlignment(.center)
+                  .multilineTextAlignment(.center)
                 }
                 .padding(8)
             }
@@ -89,6 +93,8 @@ struct CardsPagerView: View {
                 .lineLimit(nil)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
+                .padding(4)
+                .background(Color(.lightGray).opacity(0.3))
             }
             .textSelection(.enabled)
 
@@ -141,6 +147,8 @@ extension View {
       .padding(8)
       .background(Color(.systemBlue))
       .cornerRadius(8)
+      .shadow(color: Color(.black).opacity(0.5), radius: 2, y: 2)
+      .padding(2)
   }
 }
 

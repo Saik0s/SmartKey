@@ -39,7 +39,7 @@ final class KeyboardViewModel: ObservableObject {
     keyboardContext.textDocumentProxy.insertText(lastResult)
   }
 
-  func execute(_ transformPrompt: (String) -> String = { $0 }) {
+  func execute(_ transformPrompt: (String) -> String = { $0 }, asChat: Bool = false) {
     let text = keyboardContext.textDocumentProxy.selectedText
       ?? keyboardContext.textDocumentProxy.documentContext
 
@@ -49,7 +49,7 @@ final class KeyboardViewModel: ObservableObject {
     }
 
     let prompt = transformPrompt(text)
-    generate(prompt: prompt, temperature: 0.7, maxTokens: 500)
+    generate(prompt: prompt, temperature: 0.7, maxTokens: 1000, asChat: asChat)
   }
 
   func rewriteSelected() {
@@ -93,13 +93,13 @@ final class KeyboardViewModel: ObservableObject {
     generate(prompt: prompt, temperature: 0.7, maxTokens: 500)
   }
 
-  func generate(prompt: String, temperature: Double, maxTokens: Int) {
+  func generate(prompt: String, temperature: Double, maxTokens: Int, asChat: Bool = false) {
     reset()
 
     isLoading = true
     Task {
       do {
-        lastResult = try await APIService.getCompletion(for: prompt, temperature: temperature, maxTokens: maxTokens)
+        lastResult = try await APIService.getCompletion(for: prompt, temperature: temperature, maxTokens: maxTokens, isChatModel: asChat)
         selectedIndex = 1
       } catch {
         print(error.localizedDescription)
@@ -110,4 +110,3 @@ final class KeyboardViewModel: ObservableObject {
     }
   }
 }
-

@@ -1,5 +1,5 @@
-import SwiftUI
 import KeyboardKit
+import SwiftUI
 
 // MARK: - ContentView
 
@@ -17,25 +17,28 @@ struct ContentView: View {
         Section(header: Text("Keyboard State"), footer: footerText) {
           KeyboardEnabledLabel(
             isEnabled: keyboardState.isKeyboardEnabled,
-            enabledText: "Demo keyboard is enabled",
-            disabledText: "Demo keyboard not enabled")
+            enabledText: "Keyboard is enabled",
+            disabledText: "Keyboard not enabled"
+          )
           KeyboardEnabledLabel(
             isEnabled: keyboardState.isKeyboardActive,
-            enabledText: "Demo keyboard is active",
-            disabledText: "Demo keyboard is not active")
+            enabledText: "Keyboard is active",
+            disabledText: "Keyboard is not active"
+          )
           KeyboardEnabledLabel(
             isEnabled: keyboardState.isFullAccessEnabled,
             enabledText: "Full Access is enabled",
-            disabledText: "Full Access is disabled")
+            disabledText: "Full Access is disabled"
+          )
         }
         Section(header: Text("Settings")) {
           KeyboardSettingsLink()
         }
       }
-        .buttonStyle(.plain)
-        .navigationTitle("KeyboardKit")
+      .buttonStyle(.plain)
+      .navigationTitle("SmartKey")
     }
-      .navigationViewStyle(.stack)
+    .navigationViewStyle(.stack)
   }
 
   var footerText: some View {
