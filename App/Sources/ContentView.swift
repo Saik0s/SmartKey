@@ -5,12 +5,12 @@ import SwiftUI
 
 struct ContentView: View {
   @StateObject private var keyboardState = KeyboardEnabledState(bundleId: "me.igortarasenko.SmartKey.Keyboard")
-  @State private var text: String = "Write something and send it to AI"
+  @State private var text: String = "Write something and send it to AI\nOr don't do that"
 
   var body: some View {
     NavigationView {
       List {
-        Section(header: Text("Text Field")) {
+        Section(header: Text("Try it"), footer: Text("c: \(text.count)")) {
           TextEditor(text: $text)
             .frame(height: 100)
         }
@@ -53,3 +53,4 @@ struct ContentView_Previews: PreviewProvider {
     ContentView()
   }
 }
+

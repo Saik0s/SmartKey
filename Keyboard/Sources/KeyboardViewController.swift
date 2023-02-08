@@ -43,6 +43,8 @@ class KeyboardViewController: KeyboardInputViewController {
 
   override func viewWillSetupKeyboard() {
     super.viewWillSetupKeyboard()
-    setup(with: KeyboardView(viewModel: KeyboardViewModel(keyboardContext: keyboardContext)))
+    let viewModel = KeyboardViewModel(keyboardContext: keyboardContext, controller: self)
+    let keyboardView = KeyboardView(viewModel: viewModel)
+    setup(with: keyboardView)
   }
 }

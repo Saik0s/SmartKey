@@ -10,9 +10,11 @@ final class KeyboardViewModel: ObservableObject {
   @Published var selectedIndex = 0
 
   private var keyboardContext: KeyboardContext
+  weak var controller: KeyboardInputViewController?
 
-  init(keyboardContext: KeyboardContext) {
+  init(keyboardContext: KeyboardContext, controller: KeyboardInputViewController) {
     self.keyboardContext = keyboardContext
+    self.controller = controller
   }
 
   func reset() {
@@ -39,7 +41,7 @@ final class KeyboardViewModel: ObservableObject {
     keyboardContext.textDocumentProxy.insertText(lastResult)
   }
 
-  func execute(_ transformPrompt: (String) -> String = { $0 }, asChat: Bool = false) {
+  func execute(_ transformPrompt: @escaping (String) -> String = { $0 }, asChat: Bool = false) {
     let text = keyboardContext.textDocumentProxy.selectedText
       ?? keyboardContext.textDocumentProxy.documentContext
 
@@ -50,47 +52,6 @@ final class KeyboardViewModel: ObservableObject {
 
     let prompt = transformPrompt(text)
     generate(prompt: prompt, temperature: 0.7, maxTokens: 1000, asChat: asChat)
-  }
-
-  func rewriteSelected() {
-    executeSelected { "Rewrite the following text: \($0)\n" }
-  }
-
-  func rewriteClipboard() {
-    executeClipboard { "Rewrite the following text: \($0)\n" }
-  }
-
-  func rewriteDocument() {
-    executeDocument { "Rewrite the following text: \($0)\n" }
-  }
-
-  func executeSelected(_ transformPrompt: (String) -> String = { $0 }) {
-    guard let text = keyboardContext.textDocumentProxy.selectedText else {
-      error = "No selected text"
-      return
-    }
-    let prompt = transformPrompt(text)
-    generate(prompt: prompt, temperature: 0.7, maxTokens: 500)
-  }
-
-  func executeClipboard(_ transformPrompt: (String) -> String = { $0 }) {
-    guard let text = UIPasteboard.general.string else {
-      error = "No text in clipboard"
-      return
-    }
-
-    let prompt = transformPrompt(text)
-    generate(prompt: prompt, temperature: 0.7, maxTokens: 500)
-  }
-
-  func executeDocument(_ transformPrompt: (String) -> String = { $0 }) {
-    guard let text = keyboardContext.textDocumentProxy.documentContext else {
-      error = "No text in document"
-      return
-    }
-
-    let prompt = transformPrompt(text)
-    generate(prompt: prompt, temperature: 0.7, maxTokens: 500)
   }
 
   func generate(prompt: String, temperature: Double, maxTokens: Int, asChat: Bool = false) {
