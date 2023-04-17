@@ -41,7 +41,7 @@ final class KeyboardViewModel: ObservableObject {
     keyboardContext.textDocumentProxy.insertText(lastResult)
   }
 
-  func execute(_ transformPrompt: @escaping (String) -> String = { $0 }, asChat: Bool = false) {
+  func execute(_ transformPrompt: @escaping (String) -> String = { $0 }, asChat: Bool = true) {
     let text = keyboardContext.textDocumentProxy.selectedText
       ?? keyboardContext.textDocumentProxy.documentContext
 
