@@ -21,14 +21,15 @@ struct CardsPagerView: View {
     ZStack {
       Color(.systemGray4)
 
-      VStack(spacing: 4) {
+      VStack(spacing: 0) {
         Picker("Tab", selection: $viewModel.selectedIndex) {
           Text("Buttons").tag(0)
           Text("Results").tag(1)
           Text("Keyboard").tag(2)
         }
         .pickerStyle(.segmented)
-        .padding(4)
+        .padding(.horizontal, 8)
+        .padding(.top, 4)
 
         TabView(selection: $viewModel.selectedIndex) {
           buttonsCard()
@@ -41,11 +42,6 @@ struct CardsPagerView: View {
             .tag(2)
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
-        .overlay(alignment: .bottomLeading) {
-          if viewModel.isLoading {
-            ProgressView()
-          }
-        }
       }
     }
   }
@@ -108,10 +104,6 @@ struct CardsPagerView: View {
       .padding(12)
 
       HStack(spacing: 8) {
-        // Button { viewModel.execute(chat, asChat: true) } label: {
-        //   Text("Chat")
-        //     .blueButtonStyle()
-        // }
         Button { viewModel.execute { "Improve: \($0)" } } label: {
           Text("Improve")
             .blueButtonStyle()
@@ -138,18 +130,29 @@ struct CardsPagerView: View {
     }
     .overlay {
       if viewModel.isLoading {
-        Color.black.opacity(0.7)
-          .overlay {
-            VStack(spacing: 4) {
-              ProgressView()
-              Text("Generating...")
-                .padding(.bottom, 4)
-              Text("It may take up to 10 seconds\ndepending on the length of the text.")
-                .font(.footnote)
-            }
-            .multilineTextAlignment(.center)
+        VStack(spacing: 8) {
+          HStack(spacing: 4) {
+            Text("Generating...")
+            ProgressView()
           }
-          .padding(8)
+          Text("It may take up to 10 seconds depending on the length of the text.")
+            .font(.footnote)
+          Text("Here is what was sent to AI:")
+            .font(.caption)
+          ScrollView {
+            Text(viewModel.lastPrompt)
+              .font(.footnote)
+              .multilineTextAlignment(.leading)
+          }
+          .frame(maxWidth: .infinity)
+        }
+        .padding(8)
+        .multilineTextAlignment(.center)
+        .foregroundColor(.primary)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Material.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .padding(8)
       }
     }
   }
@@ -180,14 +183,14 @@ struct CardView<Content: View>: View {
     ZStack {
       Color(.systemGray3)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .padding(8)
-        .shadow(color: .black.opacity(0.5), radius: 4, y: 3)
+        .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
 
       VStack(spacing: 4) {
         content
       }
       .frame(maxHeight: .infinity)
-      .padding(16)
+      .padding(8)
     }
+    .padding(8)
   }
 }

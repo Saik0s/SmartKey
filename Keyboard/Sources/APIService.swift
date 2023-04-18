@@ -22,17 +22,17 @@ public enum APIService {
   private static let openAI = OpenAI(apiToken: Secrets.openAIKey)
   public static func getCompletion(for text: String, temperature: Double, maxTokens: Int, isChatModel: Bool = false) async throws -> String {
     print("Getting completion for: \(text)")
-    let response = try await openAI.completions(query: CompletionsQuery(
-      model: isChatModel ? .gpt3_5Turbo : .textDavinci_003,
-      prompt: text,
+    let response = try await openAI.chats(query: ChatQuery(
+      model: isChatModel ? .gpt4 : .textDavinci_003,
+      messages: [Chat(role: .user, content: text)],
       temperature: temperature,
-      maxTokens: maxTokens,
       topP: 1,
-      frequencyPenalty: 0,
+      stop: ["\n\n\n", "<|im_end|>"],
+      maxTokens: maxTokens,
       presencePenalty: 0,
-      stop: ["\n\n\n", "<|im_end|>"]
+      frequencyPenalty: 0
     ))
-    return response.choices.first?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return response.choices.first?.message.content.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
   }
 }
 //

@@ -4,6 +4,7 @@ import UIKit
 
 @MainActor
 final class KeyboardViewModel: ObservableObject {
+  @Published var lastPrompt = ""
   @Published var lastResult: String = "-"
   @Published var error: String = ""
   @Published var isLoading: Bool = false
@@ -20,6 +21,7 @@ final class KeyboardViewModel: ObservableObject {
   func reset() {
     error = ""
     lastResult = "-"
+    lastPrompt = ""
   }
 
   func replaceSelectionWithResult() {
@@ -57,6 +59,7 @@ final class KeyboardViewModel: ObservableObject {
   func generate(prompt: String, temperature: Double, maxTokens: Int, asChat: Bool = false) {
     reset()
 
+    lastPrompt = prompt
     isLoading = true
     Task {
       do {
